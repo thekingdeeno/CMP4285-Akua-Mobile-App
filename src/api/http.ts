@@ -31,6 +31,7 @@ class Http {
     initHttp() {
       const http = axios.create({
         // baseURL: process.env.EXPO_PUBLIC_APP_BASE_URL,
+        baseURL: 'https://5e1e-80-4-132-235.ngrok-free.app'
       });
   
       http.interceptors.request.use(injectToken, (error) => Promise.reject(error));

@@ -30,7 +30,7 @@ export default function DashboardScreen() {
                     color: 'white',
                 }}>Hello, Good Morning 👋</Text>
                 <Text style={{
-                    fontSize: 30,
+                    fontSize: 25,
                     fontWeight: 'bold',
                     color: 'white',
 

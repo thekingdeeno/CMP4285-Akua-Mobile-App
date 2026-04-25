@@ -5,7 +5,9 @@ const DeviceStack = createNativeStackNavigator();
 
 export default function DeviceStackScreen() {
   return (
-    <DeviceStack.Navigator>
+    <DeviceStack.Navigator
+    screenOptions={{headerShown: false}}
+    >
       <DeviceStack.Screen name="DeviceStack" component={Device} />
     </DeviceStack.Navigator>
   );
