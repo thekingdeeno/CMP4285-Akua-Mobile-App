@@ -37,6 +37,14 @@
             "imageWidth": 76
           }
         }
+      ],
+      [
+        "react-native-ble-plx",
+        {
+          "isBackgroundEnabled": false,
+          "modes": ["central"],
+          "bluetoothAlwaysPermission": "Allow Aqua App to connect to your sensor"
+        }
       ]
     ],
     "experiments": {

@@ -38,7 +38,7 @@ export default function DashboardScreen() {
             </View>
             <View style={styles.screenHead_Right}>
                 <View style={styles.userIcon}>
-                    <Text style={{fontSize: 30, fontWeight: 'bold'}}>NI</Text>
+                    <Text style={styles.userIconText}>NI</Text>
                 </View>
             </View>
         </View>

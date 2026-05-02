@@ -1,8 +1,15 @@
 import { ScrollView, View, Text, Button, TouchableOpacity } from 'react-native';
 import styles from './Device.style';
 import { Octicons, Feather } from '@expo/vector-icons'
+import { localStorage } from '@/utils/localstorage';
+import { Fragment } from 'react';
+import { useNavigation } from '@react-navigation/native';
 
 export default function DeviceScreen() {
+
+  const navigation = useNavigation<any>();
+  const pairedDevice = localStorage.getString('pairedDevice');
+
   return (
     <View style={styles.container}>
       <ScrollView style={{minHeight: '100%'}}     
@@ -13,12 +20,22 @@ export default function DeviceScreen() {
         <View style={styles.pageHead}>
           <View style={styles.headText}>
             <Text style={{color: '#585F7C', fontSize: 15}}>My Device </Text>
-            <Text style={{color: 'white', fontSize: 25, fontWeight:'bold'}}>Akua Sensor v1</Text>
+            <Text style={{color: 'white', fontSize: 25, fontWeight:'bold'}}>
+              {pairedDevice ? 'AKUASENSE v1' : 'No linked device'}
+            </Text>
           </View>
-          <View style={{...styles.statusDot, backgroundColor: 'green'}}>
+          <View style={{...styles.statusDot, backgroundColor: `${pairedDevice ? 'green':'red'}`}}>
           </View>
         </View>
 
+          <TouchableOpacity onPress={()=>navigation.navigate('DeviceConnect')}>
+            <Text style={{...styles.bottomButtonStyle ,backgroundColor: '#1A2540', color: '#3D72FA'}}>
+              Connect An Akua Sensor
+            </Text>
+          </TouchableOpacity>
+
+        { pairedDevice &&
+        <Fragment>
         <View style={styles.deviceDetails}>
           <View style={styles.detailsHead}>
             <View>
@@ -78,6 +95,8 @@ export default function DeviceScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+        </Fragment>
+        }
       </ScrollView>
     </View>
   );

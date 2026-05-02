@@ -26,9 +26,18 @@ const styles = StyleSheet.create({
 
     },
     userIcon: {
+        height: 40,
+        width: 40,
         backgroundColor: 'grey',
-        borderRadius: 50,
+        borderRadius: '50%',
         padding: 10,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    userIconText: {
+        fontSize: 15, 
+        fontWeight: 'bold'
     },
 
     // STATUS 

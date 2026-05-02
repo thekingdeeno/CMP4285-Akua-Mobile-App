@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
         display:'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 40
+        borderRadius: 50
     },
 
     pricePlan: {
