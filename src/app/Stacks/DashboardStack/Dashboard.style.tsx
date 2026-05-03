@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     userIcon: {
         height: 40,
         width: 40,
-        backgroundColor: 'grey',
+        backgroundColor: '#3a4d7f',
         borderRadius: '50%',
         padding: 10,
         display: 'flex',
@@ -37,7 +37,8 @@ const styles = StyleSheet.create({
     },
     userIconText: {
         fontSize: 15, 
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        color: '#bac5df'
     },
 
     // STATUS 
@@ -49,7 +50,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#161B26',
         width: '60%',
         padding: 15,
-        borderRadius: 25,
+        borderRadius: 15,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap : 10,
     },
 
 
@@ -71,7 +76,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#202838',
         padding: 20,
         width: '45%',
-        borderRadius: 25,
+        borderRadius: 20,
     },
 
 

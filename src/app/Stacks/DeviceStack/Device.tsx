@@ -12,29 +12,34 @@ export default function DeviceScreen() {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={{minHeight: '100%'}}     
+      <ScrollView style={{minHeight: '100%'}}
       showsVerticalScrollIndicator={false}
       showsHorizontalScrollIndicator={false}
       >
 
-        <View style={styles.pageHead}>
-          <View style={styles.headText}>
-            <Text style={{color: '#585F7C', fontSize: 15}}>My Device </Text>
-            <Text style={{color: 'white', fontSize: 25, fontWeight:'bold'}}>
-              {pairedDevice ? 'AKUASENSE v1' : 'No linked device'}
-            </Text>
+        {!pairedDevice ?
+
+        <Fragment>
+          <View style={styles.pageHead}>
+            <View style={styles.headText}>
+              <Text style={{color: '#585F7C', fontSize: 15}}>My Device </Text>
+              <Text style={{color: 'white', fontSize: 25, fontWeight:'bold'}}>
+                {pairedDevice ? 'AKUASENSE v1' : 'No Linked Device'}
+              </Text>
+            </View>
+            <View style={{...styles.statusDot, backgroundColor: `${pairedDevice ? 'green':'red'}`}}>
+            </View>
           </View>
-          <View style={{...styles.statusDot, backgroundColor: `${pairedDevice ? 'green':'red'}`}}>
-          </View>
-        </View>
 
           <TouchableOpacity onPress={()=>navigation.navigate('DeviceConnect')}>
             <Text style={{...styles.bottomButtonStyle ,backgroundColor: '#1A2540', color: '#3D72FA'}}>
               Connect An Akua Sensor
             </Text>
           </TouchableOpacity>
+        </Fragment>
 
-        { pairedDevice &&
+        :
+
         <Fragment>
         <View style={styles.deviceDetails}>
           <View style={styles.detailsHead}>
