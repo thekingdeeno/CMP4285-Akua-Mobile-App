@@ -18,13 +18,5 @@ export default function MainNavigation() {
       <AnimatedSplashOverlay />
       <AppTabs />
     </ThemeProvider>
-
-    // <MainStack.Navigator
-    // screenOptions={{headerShown: false}}
-    // >
-    //   <MainStack.Screen name="Dashboard" component={DashboardStackScreen} />
-    //   <MainStack.Screen name="Device" component={DeviceStackScreen}/>
-    //   <MainStack.Screen name="Profile" component={ProfileStackScreen}/>
-    // </MainStack.Navigator>
   )
 }

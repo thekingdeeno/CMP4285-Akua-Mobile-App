@@ -1,20 +1,26 @@
-import { ScrollView, View, Text, Button, TouchableOpacity } from 'react-native';
-import styles from './Device.style';
-import { Octicons, Feather } from '@expo/vector-icons'
-import { localStorage } from '@/utils/localstorage';
-import { Fragment } from 'react';
+import { mmkvStorage } from '@/utils/mmkv-storage';
+import { Feather, Octicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { Fragment, useState } from 'react';
+import { ScrollView, Text, TouchableOpacity, View, TextInput } from 'react-native';
+import useDevice from '@/hooks/useDevice';
+import styles from './Device.style';
+import { CustomModal } from '@/components/Modal';
 
 export default function DeviceScreen() {
 
   const navigation = useNavigation<any>();
-  const pairedDevice = localStorage.getString('pairedDevice');
+  const pairedDevice = mmkvStorage.getString('pairedDevice') 
+  const {espWifiStatus} = useDevice()
+  const [wifiConnectModal, setWifiConnectModal] = useState<boolean>(false)
+
+  console.log(pairedDevice); 
 
   return (
     <View style={styles.container}>
       <ScrollView style={{minHeight: '100%'}}
       showsVerticalScrollIndicator={false}
-      showsHorizontalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false} 
       >
 
         {!pairedDevice ?
@@ -51,6 +57,18 @@ export default function DeviceScreen() {
             <View style={{padding: 20}}>
               <Text style={{color:'white', fontSize:20, fontWeight:'bold'}}>AKUA-0042</Text>
               <Text style={{color:'#585F7C', fontSize: 15}}>ESP32 DevKit v1</Text>
+            </View>
+            <View style={{marginLeft: 60, paddingBottom:10}}>
+              <TouchableOpacity 
+              style={{
+                backgroundColor: '#1A2540',
+                padding: 10,
+                borderRadius: 10
+              }}
+              onPress={()=>setWifiConnectModal(true)}
+              >
+                <Feather name={`${espWifiStatus? 'wifi':'wifi-off'}`} size={24} color={`${espWifiStatus? 'white':'red'}`} />
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -101,6 +119,35 @@ export default function DeviceScreen() {
           </TouchableOpacity>
         </View>
         </Fragment>
+        }
+
+        {wifiConnectModal &&
+        <CustomModal
+          visible={wifiConnectModal}
+          onClose={()=>setWifiConnectModal(false)}
+
+        >
+
+          <View style={{
+            backgroundColor:"#1A2540",
+            borderRadius: 10,
+            padding: 10,
+          }}>
+            <Text style={{
+              color: "white",
+              marginBottom: 10,
+              fontSize: 10
+              }}>Connect Device To Your Network</Text>
+            <TextInput
+              style={{
+                backgroundColor:"white",
+                padding: 10,
+                borderRadius: 10
+              }}
+            />
+          </View>
+
+        </CustomModal>
         }
       </ScrollView>
     </View>

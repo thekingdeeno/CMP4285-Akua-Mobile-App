@@ -1,14 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { BleManager, Device } from 'react-native-ble-plx';
 import { BluetoothPermissions } from '@/api/DevicePermission';
+import useDevice from '@/hooks/useDevice';
+import { useNavigation } from '@react-navigation/native';
+import { Buffer } from 'buffer';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { BleManager, Device } from 'react-native-ble-plx';
+import styles from './Device.style';
+import { mmkvStorage } from '@/utils/mmkv-storage';
+
 
 const bleManager = new BleManager();
 
 export default function DeviceConnect() {
-    const [scanning, setScanning]   = useState(false);
-    const [devices, setDevices]     = useState<Device[]>([]);
+
+    // const [devices, setDevices]     = useState<Device[]>([]);
     const [connecting, setConnecting] = useState<string | null>(null);
+    const navigation = useNavigation<any>();
+
+    const { registerDevice, setBTdevice, BTscanList, setBTscanList, scanning, setScanning} = useDevice();
 
     useEffect(() => {
         return () => {
@@ -22,7 +31,7 @@ export default function DeviceConnect() {
             alert('Bluetooth permission is required to scan for devices.');
             return;
         }
-        setDevices([]);
+        setBTscanList([]);
         setScanning(true);
 
         bleManager.startDeviceScan(null, null, (error, device) => {
@@ -33,7 +42,7 @@ export default function DeviceConnect() {
             }
 
             if (device && device.name) {
-                setDevices(prev => {
+                setBTscanList(prev => {
                     const exists = prev.find(d => d.id === device.id);
                     if (exists) return prev; 
                     return [...prev, device];
@@ -55,40 +64,107 @@ export default function DeviceConnect() {
             const connected = await device.connect();
             await connected.discoverAllServicesAndCharacteristics();
 
+            if(!device){
+                return false
+            }
+
+            if (!device.serviceUUIDs){
+                return false
+            }
+
+            const pairData = {
+                uniqueId: device.id,
+                name: device.name,
+                serviceUUID: device.serviceUUIDs[0],
+                key: String(Math.floor(Math.random() * 1000000))
+            }
+
             console.log('Connected to:', connected.name);
 
-            // navigation.navigate();
+            const pairKey = Buffer.from(pairData.key).toString('base64');
+
+            await device.writeCharacteristicWithResponseForService(
+                device.serviceUUIDs[0],
+                process.env.EXPO_PUBLIC_BT_CONNECTION_CHAR!,
+                pairKey
+            )
+            .then(async (data: any) => {
+                const confirmation = await device.readCharacteristicForService(
+                    pairData.serviceUUID,
+                    process.env.EXPO_PUBLIC_BT_CONNECTION_CHAR!
+                );
+                
+                const decoded = Buffer.from(confirmation.value as string, 'base64').toString('utf-8');
+                const response = decoded.split('::');
+
+                console.log(response);
+                
+                
+                if(response[0] === 'SUCCESS'){
+                    mmkvStorage.set('pairedDevice', JSON.stringify(pairData));
+
+                    const currentUser = mmkvStorage.getString('currentUser');
+                    if (currentUser) {
+                        console.log("In register block");
+                        
+                        const user = JSON.parse(currentUser).user_id
+
+                        const regDevice = await registerDevice(user, device.id);
+
+                        console.log({user, regDevice});
+                        
+                    } else {
+                        console.log("No user in localstorage");
+                        
+                    }
+
+                    setBTdevice(device);
+                    
+                    alert('Device paired successfully!');
+                    navigation.navigate('Dashboard')
+                }else{
+                    alert('Failed to pair device. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Write characteristic error:', error)
+            })
 
         } catch (error) {
             console.error('Connection failed:', error);
+        } finally {
             setConnecting(null);
         }
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Link a Device</Text>
-            <Text style={styles.subtitle}>
+            <Text style={{color: 'white', fontSize: 25, fontWeight:'bold'}}>Link a Device</Text>
+            <Text style={{color: '#585F7C', fontSize: 15, marginBottom: 20}}>
                 Make sure your Aqua Sensor is powered on and nearby
             </Text>
 
             <TouchableOpacity
-                style={[styles.scanBtn, scanning && { opacity: 0.6 }]}
+                style={[{ backgroundColor: '#1A2540', borderRadius: 10, marginVertical: 10, marginBottom: 20 }, scanning && { opacity: 0.6 }]}
                 onPress={startScan}
                 disabled={scanning}
             >
                 {scanning
-                    ? <ActivityIndicator color="white" />
-                    : <Text style={styles.scanBtnText}>Scan for Devices</Text>
+                    ? <ActivityIndicator color="#3D72FA" style={styles.bottomButtonStyle}/>
+                    : <Text style={{...styles.bottomButtonStyle ,backgroundColor: '#1A2540', color: '#3D72FA'}}>Scan for Devices</Text>
                 }
             </TouchableOpacity>
 
-            {devices.length === 0 && !scanning && (
-                <Text style={styles.empty}>No devices found. Try scanning again.</Text>
+            {BTscanList.length === 0 && !scanning && (
+                <Text style={{
+                    textAlign: 'center',
+                    color: 'grey',
+                    marginTop: 20,
+             }}>No devices found. Try scanning again.</Text>
             )}
 
             <FlatList
-                data={devices}
+                data={BTscanList}
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => (
                     <TouchableOpacity
@@ -112,66 +188,3 @@ export default function DeviceConnect() {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#F5F7FA',
-        padding: 20,
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: '700',
-        color: 'grey',
-        marginBottom: 8,
-    },
-    subtitle: {
-        fontSize: 16,
-        color: 'grey',
-        marginBottom: 20,
-    },
-    scanBtn: {
-        backgroundColor: '#3D72FA',
-        borderRadius: 10,
-        padding: 20,
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    scanBtnText: {
-        color: '#FFFFFF',
-        fontWeight: '700',
-        fontSize: 18,
-    },
-    empty: {
-        textAlign: 'center',
-        color: 'grey',
-        marginTop: 20,
-    },
-    deviceCard: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 10,
-        padding: 20,
-        marginBottom: 20,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    deviceName: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: 'grey',
-    },
-    deviceId: {
-        fontSize: 14,
-        color: 'grey',
-        marginTop: 2,
-    },
-    arrow: {
-        fontSize: 22,
-        color: 'grey',
-    },
-});

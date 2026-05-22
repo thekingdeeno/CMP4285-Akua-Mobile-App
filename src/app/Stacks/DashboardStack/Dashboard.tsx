@@ -1,21 +1,59 @@
-import { View, Text, ScrollView } from 'react-native';
-import styles from './Dashboard.style';
 import useDevice from '@/hooks/useDevice';
-import { Fragment, useEffect } from 'react';
-import { localStorage } from '@/utils/localstorage';
+import { Fragment, useEffect, useState } from 'react';
+import { ScrollView, Text, View, RefreshControl } from 'react-native';
+import styles from './Dashboard.style';
+import { mmkvStorage } from '@/utils/mmkv-storage';
+mmkvStorage
 
 export default function DashboardScreen() {
-    const { getLastSavedReadings, readings, isLoading , metricsIndex } = useDevice();
+    const { getReadings_db, getReadings_bt, BTdevice, readings, isLoading , metricsIndex, attemptRecconnect } = useDevice();
+    const pairedDevice = mmkvStorage.getString('pairedDevice')
+    const [refreshing, setRefreshing] = useState<boolean>(false)
+
+    // mmkvStorage.remove('pairedDevice')
+
+    function LoadPage(){
+        if (BTdevice) {
+            console.log("BTDEICE FOUND", BTdevice);
+            getReadings_bt()
+            
+        } else {
+            console.log("NO cBTDEEVICE");
+            if (pairedDevice) {
+                console.log("has pair");
+                
+            }else {
+                console.log("No pair")
+            }
+            attemptRecconnect().then((reconnect)=>{
+                if (reconnect && reconnect.status === false) {
+                    console.log("Unable to reconnect device");
+                    getReadings_db(1);
+                }
+            });
+        }
+    }
+
     useEffect(() => {
-        if (localStorage.getString('pairedDevice')) getLastSavedReadings('');
-        getLastSavedReadings(1);
-    }, [readings]);
+        LoadPage()
+    }, [BTdevice, refreshing]);
 
     return (
     <View style={styles.container}>
     <ScrollView
     showsVerticalScrollIndicator={false}
     showsHorizontalScrollIndicator={false}
+    refreshControl={
+        <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={()=>{
+                LoadPage()
+            }} 
+            // Optional: Customize colors
+            tintColor="#007AFF" // iOS spinner color
+            colors={['#007AFF']} // Android spinner colors
+        />
+    }
     >
         <View
             style={styles.screenHead}
@@ -88,11 +126,11 @@ export default function DashboardScreen() {
                 {readings.map((metric, index) => (
                     <View key={index} style={styles.metricCard}>
                         <Text style={{
-                            fontSize: 13,
+                            fontSize: 12,
                             color: 'white',
                         }}>{metric.name}</Text>
                         <Text style={{
-                            fontSize: 25,
+                            fontSize: 20,
                             color: 'white',
                             fontWeight: 'bold',
                         }}>{metric.value}</Text>
@@ -128,7 +166,6 @@ export default function DashboardScreen() {
                         overflow: 'hidden',
                     }}>
                         <View style={{
-                        // 
                             backgroundColor: index.percent < 50 ? '#3A6EF0' : '#0ab424',
                             width: `${index.percent}%`,
                             height: '100%',

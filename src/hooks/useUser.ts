@@ -1,10 +1,13 @@
-import { useState } from "react";
 import { httpClient } from "@/api/http";
-import { localStorage } from "@/utils/localstorage";
+import { mmkvStorage } from "@/utils/mmkv-storage";
+import { useState } from "react";
+import { useNavigation } from '@react-navigation/native';
+
 
 const useUser = () => {
 
     const [isLoading, setIsLoading] = useState(true);
+    const navigation = useNavigation<any>();
 
     const login = async (email: string, password: string) => {
         try {
@@ -12,7 +15,7 @@ const useUser = () => {
             const response: any = await httpClient.post('/user/login', { email, password });
             
             if (response.data.status === true) {
-                localStorage.set('currentUser', JSON.stringify(response.data.data));
+                mmkvStorage.set('currentUser', JSON.stringify(response.data.data));
             }
             
             return response.data;
@@ -27,11 +30,16 @@ const useUser = () => {
         }
     }
 
+    const logout = async ()=>{
+        mmkvStorage.remove("currentUser")
+        navigation.replace("Auth")
+    }
+
     return {
         login,
         isLoading,
+        logout
     }
-
 
 }
 

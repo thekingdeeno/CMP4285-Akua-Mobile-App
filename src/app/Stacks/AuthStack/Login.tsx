@@ -7,6 +7,7 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    Text
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AnimatedIcon } from '@/components/animated-icon';
@@ -88,6 +89,24 @@ export default function LoginScreen() {
               placeholderTextColor="#999"
             />
 
+            <View>
+              <Text
+              style={{
+                color: "white"
+              }}
+              >
+                Don't have an account?, 
+                <Text
+                  style={{
+                    color: 'rgb(81, 110, 225)'
+                  }}
+                  onPress={()=>{
+                    navigation.navigate('Signup')
+                  }}
+                > Sign up</Text>
+              </Text>
+            </View>
+
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
               <ThemedText type="small" style={styles.buttonText}>
                 Log in
@@ -104,7 +123,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: 'grey'
+    backgroundColor: '#0D1116',
   },
   safeArea: {
     flex: 1,

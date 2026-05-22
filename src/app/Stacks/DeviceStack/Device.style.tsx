@@ -41,8 +41,11 @@ const styles = StyleSheet.create({
     detailsHead:{
         display: 'flex',
         alignItems: 'center',
-        // justifyContent:'flex-start',
         flexDirection: 'row'
+    },
+
+    detialsHeadWifi:{
+
     },
 
     espStat: {
@@ -71,7 +74,40 @@ const styles = StyleSheet.create({
     bottomButtonStyle: {
         borderRadius: 15,
         textAlign:'center', padding: 20, fontSize: 15, fontWeight: 'bold'
-    }
+    },
+     scanBtnText: {
+        color: '#FFFFFF',
+        fontWeight: '700',
+        fontSize: 18,
+    },
+
+    deviceCard: {
+        backgroundColor: '#161B26',
+        borderRadius: 10,
+        padding: 20,
+        marginBottom: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    deviceName: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: 'white',
+    },
+    deviceId: {
+        fontSize: 14,
+        color: 'grey',
+        marginTop: 2,
+    },
+    arrow: {
+        fontSize: 22,
+        color: 'white',
+    },
 });
 
 export default styles;

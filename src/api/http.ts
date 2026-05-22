@@ -1,9 +1,9 @@
-import { localStorage } from '@/utils/localstorage';
+import { mmkvStorage } from '@/utils/mmkv-storage';
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
 const injectToken = async (config: AxiosRequestConfig): Promise<AxiosRequestConfig | any> => {
     try {
-      const token = localStorage.getString('accessToken');
+      const token = mmkvStorage.getString('accessToken');
   
       if (token != null) {
         if (!config) {

@@ -1,13 +1,15 @@
-import {createNativeStackNavigator} from "@react-navigation/native-stack";
-import AuthNavigation from "./Stacks/AuthStack";
-import MainNavigation from "./Home";
+import { mmkvStorage } from "@/utils/mmkv-storage";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useEffect } from "react";
-import { useNavigation } from '@react-navigation/native';
-import { localStorage } from "@/utils/localstorage";
+import MainNavigation from "./Home";
+import AuthNavigation from "./Stacks/AuthStack";
 
 const Stack = createNativeStackNavigator();
 
-const loggedIn = localStorage.getString('currentUser')
+const loggedIn = mmkvStorage.getString('currentUser')
+
+console.log(loggedIn);
+
 
 const Navigation = () => {
     useEffect(()=>{

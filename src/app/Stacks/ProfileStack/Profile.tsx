@@ -2,8 +2,14 @@ import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { Feather, Entypo } from '@expo/vector-icons';
 
 import styles from './Profile.style';
+import { mmkvStorage } from '@/utils/mmkv-storage';
+import useUser from '@/hooks/useUser';
 
 export default function ProfileScreen() {
+
+  const { logout } = useUser();
+
+
   return (
     <View style={styles.container}>
       <ScrollView
@@ -35,7 +41,7 @@ export default function ProfileScreen() {
         </View>
 
 
-          <TouchableOpacity  onPress={()=>null}>
+          <TouchableOpacity  onPress={()=>{logout()}}>
             <Text style={{...styles.bottomButtonStyle, backgroundColor: '#2A1A1A', color: '#B23729'}}>
               Log Out
             </Text>
